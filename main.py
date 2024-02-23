@@ -33,7 +33,33 @@ def checking_selection(chat_id, chat, player_role):
         chat.update({player_role: True})
 def timer(chat_id, sec):
     global chats_list, time_now
-    chat_list[chat_id].update({'time_interval': datetime.now()+timedelta(second=sec)})
-    while chats_list[chat_id]['time_interval']>time.now:
+    chats_list[chat_id].update({'time_interval': datetime.now()+timedelta(second=sec)})
+    while chats_list[chat_id]['time_interval']>time_now:
         time_now=datetime.now()
-        
+def live_players(player_dict):
+    mes="Живые игроки:"
+    player_keys=list(player_dict.keys())
+    for i in range(len(player_keys)):
+        mes+=f"\n{i+1}.{player_dict[player_keys[i]]["name"]}"
+    return
+def players_role(player_dict):
+    mes="Кто-то из них:*\n"
+    player_keys=list(player_dict.keys())
+    shuffle(player_keys)
+    for i in range(len(player_keys)):
+        mes+=f'{player_dict[player_keys[i]]["role"]}'
+        if i < len(player_keys) -1:
+            mes += ", "
+    return mes 
+def voices_handler(game_id):
+    global chats_list
+    players=chats_list[game_id]['players']
+    voice_dict=[]
+    for key, val in players.items():
+        if 'voice' in val:
+            voice_dict.append(val['voice'])
+            players[key].pop('voice')
+    if len(voice_dict)>0:
+        dead=players[[[max](set(voice_dict), key=voice_dict.count)][0]]
+        players.pop([max(set(voice_dict), key=voice_dict.count)][0])
+        return dead 
